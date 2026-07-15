@@ -1,0 +1,204 @@
+/*
+ * static/styles.css
+ *
+ * Fichier de styles global pour l'application Mastermind.
+ * Contient la mise en forme pour les pages de formulaire et de résultats.
+ */
+
+/*----------------------------------
+  Reset et styles de base
+  - Définition de la police par défaut
+  - Marges générales et couleur de fond
+----------------------------------*/
+body {
+  font-family: Arial, sans-serif;  /* Police sans-serif pour une lisibilité optimale */
+  margin: 40px;                    /* Marge autour de tout le contenu */
+  background-color: #f7f7f7;      /* Fond gris clair neutre */
+  color: #333;                     /* Couleur de texte sombre pour le contraste */
+}
+h1, h2 {
+  text-align: center;             /* Centrer tous les titres de niveau 1 et 2 */
+  margin-bottom: 20px;            /* Espacement sous les titres */
+}
+
+/*----------------------------------
+  Styles de la page de formulaire
+  - Conteneur principal du formulaire
+  - Disposition des lignes de champ
+  - Boutons
+----------------------------------*/
+.form-container {
+  max-width: 600px;               /* Largeur maximale pour un confort de lecture */
+  margin: 40px auto;              /* Centre horizontalement et donne un espace vertical */
+  padding: 20px;                  /* Espacement interne du conteneur */
+  background: #fff;               /* Fond blanc pour le contraste */
+  border-radius: 8px;             /* Coins arrondis pour plus de douceur visuelle */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Ombre légère pour le relief */
+}
+
+.form-row {
+  display: flex;                  /* Utilise flexbox pour aligner label et champ */
+  align-items: center;            /* Centrer verticalement le contenu de chaque ligne */
+  margin: 15px 0;                 /* Espacement entre chaque ligne de champ */
+}
+
+.form-row label,
+.form-row span {
+  flex: 1;                        /* Label ou texte prend 1/3 de la ligne */
+  font-weight: bold;              /* Texte important pour distinguer les étiquettes */
+}
+
+.form-row select,
+.form-row input[type="checkbox"],
+.form-row input[type="radio"] {
+  flex: 2;                        /* Champs interactifs prennent 2/3 de la ligne */
+  margin-right: 10px;             /* Espace entre le champ et le bord droit */
+}
+
+.slider-row input[type="range"] {
+  flex: 3;                        /* Pour les sliders, on alloue plus d'espace */
+  margin-right: 10px;             /* Espace à droite entre slider et value */
+}
+
+.slider-row output {
+  width: 50px;                    /* Largeur fixe pour afficher la valeur */
+  text-align: center;             /* Centre le texte à l'intérieur de l'output */
+  font-weight: bold;              /* Valeur du slider mise en évidence */
+}
+
+button {
+  display: block;                 /* Le bouton prend toute la largeur */
+  width: 100%;                    /* 100% du conteneur parent */
+  padding: 12px;                  /* Espacement interne confortable */
+  margin-top: 20px;               /* Séparation du reste du formulaire */
+  font-size: 16px;                /* Taille de texte lisible */
+  border: none;                   /* Suppression de la bordure native */
+  border-radius: 5px;             /* Coins arrondis du bouton */
+  background-color: #007bff;      /* Couleur bleue vive pour attirer l'attention */
+  color: white;                   /* Texte blanc pour le contraste */
+  cursor: pointer;                /* Curseur pointeur pour indiquer cliquable */
+}
+
+button:hover {
+  background-color: #0056b3;      /* Couleur plus foncée au survol */
+}
+
+/*----------------------------------
+  Styles de la page de résultats
+  - Conteneur des résultats
+  - Résumé statistique
+  - Histogramme vertical
+  - Bouton lien
+----------------------------------*/
+.results-container {
+  max-width: 700px;               /* Conserve une largeur confortable */
+  margin: 40px auto;              /* Centre et espace verticalement */
+  padding: 20px;                  /* Espacement interne */
+  background: #fff;               /* Fond blanc pur */
+  border-radius: 8px;             /* Coins arrondis */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Ombre pour le relief */
+}
+
+.summary {
+  display: flex;                  /* Flex layout pour les stats */
+  justify-content: space-around;  /* Espace égal entre chaque stat */
+  margin-bottom: 30px;            /* Séparation de l'histogramme */
+}
+
+.summary p {
+  margin: 0 10px;                 /* Marge horizontale entre paires de stats */
+  font-size: 1.1em;               /* Taille de texte légèrement plus grande */
+}
+
+/*----------------------------------
+  Styles de l'histogramme vertical
+  - Disposition des barres
+  - Étiquettes des axes
+----------------------------------*/
+.chart-vertical {
+  display: flex;                  /* Affiche les colonnes côte à côte */
+  align-items: flex-end;          /* Aligne les barres en bas */
+  justify-content: center;        /* Centre l'ensemble de l'histogramme */
+  gap: 20px;                      /* Espace entre chaque barre */
+  height: 300px;                  /* Hauteur fixe pour l'échelle */
+  margin: 0 auto 70px;            /* Centre horizontal et marge inférieure */
+  position: relative;             /* Nécessaire pour le pseudo-élément ::after */
+}
+
+/* Label de l’axe X (Tentatives) */
+.chart-vertical::after {
+  content: "Tentatives";         /* Texte de l’axe */
+  position: absolute;             /* Positionnement précis sous l’histogramme */
+  bottom: -30px;                  /* Décalage vertical */
+  left: 50%;                      /* Centre horizontal */
+  transform: translateX(-50%);    /* Ajustement exact du centrage */
+  font-weight: 600;               /* Texte en gras */
+  color: #333;                    /* Couleur sombre pour la lisibilité */
+}
+
+.bar-col {
+  display: flex;                  /* Colonne flexible */
+  flex-direction: column;         /* Empilement vertical */
+  align-items: center;            /* Centre contenu horizontalement */
+  justify-content: flex-end;      /* Place les barres en bas */
+  height: 100%;                   /* Occupe toute la hauteur du conteneur */
+}
+
+.bar-col .bar {
+  width: 40px;                    /* Largeur fixe des barres */
+  background-color: #007bff;      /* Couleur bleue cohérente */
+  border-radius: 4px 4px 0 0;     /* Coins arrondis en haut */
+  transition: background-color 0.3s; /* Douce transition au survol */
+}
+
+.bar-col .bar:hover {
+  background-color: #0056b3;      /* Teinte plus foncée au survol */
+}
+
+.bar-col .value {
+  margin-bottom: 5px;             /* Séparation entre valeur et barre */
+  font-family: monospace;         /* Police à chasse fixe pour chiffres */
+  font-size: 0.9em;               /* Taille de texte modérée */
+}
+
+.bar-col .label {
+  margin-top: 5px;                /* Espace entre barre et étiquette */
+  font-weight: 600;               /* Texte en gras pour l’étiquette */
+  font-size: 0.9em;               /* Taille de texte uniforme */
+}
+
+/*----------------------------------
+  Bouton-lien pour relancer une simulation
+----------------------------------*/
+.btn-link {
+  display: inline-block;          /* Se comporte comme un bouton */
+  margin: 0 auto;                 /* Centre horizontalement */
+  padding: 10px 20px;             /* Zone cliquable généreuse */
+  font-size: 1em;                 /* Taille de texte standard */
+  color: #007bff;                 /* Couleur bleue pour le lien */
+  text-decoration: none;          /* Supprime le soulignement */
+  border: 2px solid #007bff;      /* Contour bleu distinct */
+  border-radius: 5px;             /* Coins arrondis */
+  transition: background-color 0.3s, color 0.3s; /* Transition des couleurs */
+}
+
+.btn-link:hover {
+  background-color: #007bff;      /* Fond bleu au survol */
+  color: #fff;                    /* Texte blanc pour le contraste */
+}
+
+/*----------------------------------
+  Visualisation des pions (optionnel)
+----------------------------------*/
+.peg {
+  display: inline-block;          /* Affiche les pions côte à côte */
+  width: 20px;                    /* Taille circulaire fixe */
+  height: 20px;
+  border-radius: 50%;             /* Forme circulaire */
+  margin: 2px;                    /* Petit espace autour de chaque pion */
+}
+.peg.red   { background-color: red;   /* Pion rouge pour retour */ }
+.peg.white {                           /* Pion blanc pour retour */
+  background-color: white;
+  border: 1px solid #ccc;        /* Bord gris clair */
+}

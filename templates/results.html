@@ -1,0 +1,247 @@
+<!-- templates/results.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résultats Mastermind</title>
+
+  <!-- Import de la police Google Fonts pour une esthétique moderne et cohérente avec la page d'accueil -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /*----------------------------*/
+    /* RÉINITIALISATION GLOBALE */
+    /*----------------------------*/
+
+    /* Applique box-sizing pour un modèle de boîte plus intuitif */
+    * { box-sizing: border-box; }
+
+    /*----------------------------------*/
+    /* STYLE DU BODY AVEC IMAGE DE FOND */
+    /*----------------------------------*/
+
+    body {
+      margin: 0;                       /* Supprime les marges par défaut */
+      padding: 0;                      /* Supprime les paddings par défaut */
+      font-family: 'Poppins', sans-serif; /* Applique la police moderne */
+      background-image: url("{{ url_for('static', filename='background_mastermind.png') }}"); /* Appelle l'image de fond */
+      background-size: cover;         /* L'image remplit tout l'écran */
+      background-repeat: no-repeat;   /* Ne répète pas l'image */
+      background-position: center;    /* Centre l'image */
+      display: flex;                  /* Flexbox pour centrer le contenu */
+      justify-content: center;        /* Centre horizontalement */
+      align-items: center;            /* Centre verticalement */
+      min-height: 100vh;              /* Prend toute la hauteur de l'écran */
+      position: relative;             /* Nécessaire pour placer l'overlay */
+      color: #1f2937;                 /* Couleur par défaut du texte */
+    }
+
+    /*--------------------------------------------------------*/
+    /* SURCOUCHE TRANSLUCIDE POUR RENFORCER LA LISIBILITÉ    */
+    /*--------------------------------------------------------*/
+
+    .overlay {
+      position: absolute;                 /* Superposée au body */
+      inset: 0;                           /* Top, Right, Bottom, Left = 0 */
+      background: rgba(255, 255, 255, 0.8); /* Blanc translucide (80% opaque) */
+      z-index: 0;                         /* Derrière le contenu principal */
+    }
+
+    /*--------------------------------------------------*/
+    /* CONTENEUR PRINCIPAL DES STATISTIQUES ET RÉSULTATS */
+    /*--------------------------------------------------*/
+
+    .results-container {
+      position: relative;                 /* Pour être au-dessus de l'overlay */
+      z-index: 1;                         /* Priorité d'affichage */
+      background: #ffffff;                /* Fond blanc pour la carte de résultats */
+      max-width: 700px;                   /* Largeur maximale lisible */
+      width: 100%;                        /* Largeur responsive */
+      padding: 2.5rem;                    /* Espacement intérieur */
+      border-radius: 1rem;                /* Coins arrondis doux */
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Ombre élégante */
+      text-align: center;                /* Centre le texte */
+    }
+
+    /*----------------------------*/
+    /* TITRE PRINCIPAL DE LA PAGE */
+    /*----------------------------*/
+
+    h1 {
+      font-size: 2rem;              /* Taille de titre adaptée */
+      font-weight: 600;             /* Plus épais */
+      margin-bottom: 1.5rem;        /* Espacement dessous */
+    }
+
+    /*-------------------------------*/
+    /* RÉSUMÉ DES INDICATEURS CLÉS  */
+    /*-------------------------------*/
+
+    .summary {
+      display: flex;                /* Disposition en ligne */
+      justify-content: space-around;/* Espacement automatique */
+      margin-bottom: 2rem;          /* Séparation avec histogramme */
+      flex-wrap: wrap;              /* Permet de passer à la ligne si petit écran */
+      gap: 1rem;                    /* Espacement entre les cartes */
+    }
+
+    .summary .stat {
+      flex: 1 1 30%;                /* Chaque carte prend environ 30% */
+      background: #f9fafb;          /* Fond très clair */
+      padding: 1rem;                /* Espacement intérieur */
+      border-radius: 0.75rem;       /* Coins légèrement arrondis */
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Ombre interne subtile */
+    }
+
+    /* Libellé de l'indicateur */
+    .stat strong {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #4f46e5;              /* Violet pour cohérence graphique */
+    }
+
+    /* Valeur numérique */
+    .stat span {
+      font-size: 1.5rem;
+      color: #1f2937;
+    }
+
+    /*-----------------------------*/
+    /* TITRE DE LA SECTION CHART   */
+    /*-----------------------------*/
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #374151;
+    }
+
+    /*-----------------------------*/
+    /* HISTOGRAMME DES TENTATIVES  */
+    /*-----------------------------*/
+
+    .chart-vertical {
+      display: flex;                /* Barres côte à côte */
+      align-items: flex-end;        /* Alignement bas des barres */
+      justify-content: center;
+      gap: 0.75rem;
+      height: 300px;               /* Hauteur fixe */
+      margin-bottom: 2rem;
+      position: relative;          /* Pour ajouter un label global */
+    }
+
+    /* Légende globale "Tentatives" */
+    .chart-vertical::after {
+      content: "Tentatives";
+      position: absolute;
+      bottom: -1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 600;
+      color: #374151;
+    }
+
+    /* Colonne contenant une barre + son étiquette */
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+
+    /* La barre de fréquence */
+    .bar {
+      width: 40px;
+      background: #4f46e5;         /* Violet par défaut */
+      border-radius: 0.5rem 0.5rem 0 0; /* Coins arrondis en haut */
+      transition: background 0.3s; /* Animation douce */
+    }
+
+    .bar:hover {
+      background: #4338ca;         /* Violet foncé au survol */
+    }
+
+    .value {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #374151;
+    }
+
+    .label {
+      margin-top: 0.25rem;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    /*----------------------------------------*/
+    /* BOUTON POUR REVENIR À LA PAGE D’ACCUEIL */
+    /*----------------------------------------*/
+
+    .btn-link {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: 2px solid #4f46e5; /* Contour violet */
+      border-radius: 0.75rem;
+      color: #4f46e5;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .btn-link:hover {
+      background: #4f46e5;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay blanche par-dessus l’image de fond -->
+  <div class="overlay"></div>
+
+  <!-- Conteneur principal qui affiche les résultats -->
+  <div class="results-container">
+
+    <!-- Titre principal avec le nombre de simulations -->
+    <h1>Résultats de {{ n_sim }} simulations</h1>
+
+    <!-- Cartes de synthèse : moyenne, écart-type et max -->
+    <div class="summary">
+      <div class="stat">
+        <strong>Moyenne</strong>
+        <span>{{ avg }}</span>
+      </div>
+      <div class="stat">
+        <strong>Écart‑type</strong>
+        <span>{{ std }}</span>
+      </div>
+      <div class="stat">
+        <strong>Max tentatives</strong>
+        <span>{{ max_attempts }}</span>
+      </div>
+    </div>
+
+    <!-- Titre de la distribution -->
+    <h2>Distribution des tentatives</h2>
+
+    <!-- Graphique en barres des fréquences -->
+    <div class="chart-vertical">
+      {% for attempts, freq in distribution %}
+      <div class="bar-col">
+        <!-- Hauteur proportionnelle à la fréquence -->
+        <div class="bar" style="height: {{ (freq / max_freq * 100) | round(1) }}%;"></div>
+        <div class="value">{{ freq }}</div>
+        <div class="label">{{ attempts }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bouton de retour vers la page d’accueil -->
+    <a href="{{ url_for('index') }}" class="btn-link">↩ Nouvelle simulation</a>
+  </div>
+</body>
+</html>

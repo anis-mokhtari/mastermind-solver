@@ -1,0 +1,209 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation Mastermind</title>
+
+  <!-- Import de la police Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Application globale du box-sizing pour éviter les débordements */
+    * { box-sizing: border-box; }
+
+    /* STYLE DU BODY PRINCIPAL AVEC IMAGE DE FOND */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif; /* Police moderne et lisible */
+      background-image: url("{{ url_for('static', filename='background_mastermind.png') }}"); /* Image de fond Mastermind */
+      background-size: cover;              /* L'image couvre tout l'écran */
+      background-repeat: no-repeat;        /* Ne pas répéter l'image */
+      background-position: center;         /* Centre l'image */
+      display: flex;                       /* Utilise Flexbox pour le centrage */
+      justify-content: center;             /* Centre horizontalement */
+      align-items: center;                 /* Centre verticalement */
+      min-height: 100vh;                   /* Prend toute la hauteur de l'écran */
+      position: relative;                  /* Nécessaire pour la surcouche overlay */
+    }
+
+    /* SURCOUCHE BLANCHE TRANSPARENTE POUR AMÉLIORER LA LISIBILITÉ */
+    .overlay {
+      position: absolute;                  /* Couvre tout l'écran */
+      inset: 0;                            /* Top, Right, Bottom, Left à 0 */
+      background: rgba(255, 255, 255, 0.75); /* Blanc avec transparence */
+      z-index: 0;                          /* En arrière-plan */
+    }
+
+    /* CONTENEUR DU FORMULAIRE */
+    .form-container {
+      position: relative; /* Pour apparaître au-dessus de l'overlay */
+      z-index: 1;         /* Priorité d'affichage */
+      background: #ffffff; /* Fond blanc classique */
+      max-width: 600px;
+      width: 100%;
+      padding: 2.5rem;
+      border-radius: 1rem; /* Coins arrondis */
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Ombre discrète */
+    }
+
+    /* TITRE PRINCIPAL */
+    h1 {
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1f2937; /* Gris foncé */
+      text-align: center;
+    }
+
+    /* CHAQUE GROUPE DE CHAMPS */
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.25rem; /* Espacement entre les champs */
+    }
+
+    /* ÉTIQUETTES DES CHAMPS */
+    .form-row label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #374151; /* Gris moyen */
+    }
+
+    /* CHAMPS DE SAISIE ET SLIDERS */
+    .form-row select,
+    .form-row input[type="number"],
+    .form-row input[type="range"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    /* SLIDER : SUPPRESSION DES MARGES ET AJOUT D’UN CURSEUR */
+    .form-row input[type="range"] {
+      padding: 0;
+      height: 2rem;
+      cursor: pointer;
+    }
+
+    /* FOCUS : MET EN ÉVIDENCE LE CHAMP ACTIF */
+    .form-row input[type="range"]:focus,
+    .form-row select:focus,
+    .form-row input[type="number"]:focus {
+      border-color: #4f46e5; /* Violet */
+    }
+
+    /* GROUPE DE CHECKBOXES ET BOUTONS RADIO */
+    .form-row .checkbox-group,
+    .form-row .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* LABELS POUR CHECKBOXES ET RADIOS */
+    .form-row .checkbox-group label,
+    .form-row .radio-group label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    /* STYLE POUR LES INPUTS RADIO ET CHECKBOX */
+    .form-row .checkbox-group input,
+    .form-row .radio-group input {
+      margin-right: 0.5rem;
+      accent-color: #4f46e5;
+    }
+
+    /* AFFICHAGE DE LA VALEUR DU SLIDER */
+    .form-row output {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: #6b7280;
+      text-align: right;
+    }
+
+    /* STYLE DU BOUTON */
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      border: none;
+      border-radius: 0.75rem;
+      background: #4f46e5;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    /* CHANGEMENT DE COULEUR AU SURVOL */
+    button:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <!-- Surcouche transparente blanche au-dessus de l'image -->
+  <div class="overlay"></div>
+
+  <!-- Conteneur principal centré -->
+  <div class="form-container">
+    <h1>Simulation Mastermind</h1>
+
+    <!-- Formulaire vers la route /simulate -->
+    <form action="{{ url_for('simulate') }}" method="post">
+
+      <!-- Sélection du nombre de couleurs -->
+      <div class="form-row">
+        <label for="n_colors">Nombre de couleurs</label>
+        <select name="n_colors" id="n_colors">
+          {% for c in [5,6,7,8] %}
+          <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Sélection de la longueur du code -->
+      <div class="form-row">
+        <label for="code_length">Longueur du code</label>
+        <select name="code_length" id="code_length">
+          {% for l in [3,4,5] %}
+          <option value="{{ l }}">{{ l }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Checkbox pour la répétition autorisée -->
+      <div class="form-row checkbox-group">
+        <label><input type="checkbox" name="allow_repetition"> Autoriser la répétition</label>
+      </div>
+
+      <!-- Sélection du mode de jeu -->
+      <div class="form-row radio-group">
+        <label><input type="radio" name="mode" value="standard" checked> Standard</label>
+        <label><input type="radio" name="mode" value="beginner"> Beginner</label>
+      </div>
+
+      <!-- Slider pour choisir le nombre de simulations -->
+      <div class="form-row">
+        <label for="n_simulations">Nombre de simulations</label>
+        <input type="range" name="n_simulations" id="n_simulations" min="100" max="1000" step="100" value="1000" oninput="this.nextElementSibling.value = this.value">
+        <output>1000</output>
+      </div>
+
+      <!-- Bouton pour soumettre le formulaire -->
+      <button type="submit">Lancer la simulation</button>
+    </form>
+  </div>
+</body>
+</html>
