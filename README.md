@@ -1,67 +1,67 @@
 # Mastermind Simulator
 
-Application web (Flask) qui simule des parties de Mastermind résolues automatiquement par un codebreaker, et qui analyse statistiquement le nombre de tentatives nécessaires sur un grand nombre de simulations.
+A Flask web application that automatically solves games of Mastermind and statistically analyzes the number of attempts required across a large number of simulations.
 
-## Contexte
+## Context
 
-Projet réalisé à deux (Anis Mokhtari & Aymeric Pedanou) dans le cadre du cours *Object-Oriented Programming in Python* (M1 MAEF, Université Paris 1 Panthéon-Sorbonne, 2025). Le sujet imposait plusieurs contraintes : une architecture strictement orientée objet (abstraction et héritage), une implémentation vectorisée avec NumPy, l'usage des seules bibliothèques standard `numpy` et `flask`, et une structure de projet imposée.
+Project developed for the *Object-Oriented Programming in Python* course (M1 MAEF, Université Paris 1 Panthéon-Sorbonne, 2025). The assignment enforced several constraints: a strictly object-oriented architecture (abstraction and inheritance), NumPy-based vectorization, using only the standard `numpy` and `flask` libraries, and a predefined project structure.
 
-Le sujet complet est inclus dans le dépôt (`sujet.pdf`).
+The full assignment brief is included in the repository (`sujet.pdf`).
 
-## Fonctionnalités
+## Features
 
-- **Quatre variantes de jeu**, obtenues en combinant deux règles alternatives :
-  - Mode **Standard** (feedback global : nombre de pions bien placés / mal placés) et mode **Beginners** (feedback positionnel : chaque position reçoit `red`, `white` ou `none`), implémentés via une classe abstraite `MastermindGame` et deux sous-classes (`StandardGame`, `BeginnersGame`).
-  - Répétition des couleurs **autorisée ou interdite** dans le code secret.
-- **Résolution automatique** : conformément au sujet, le codebreaker utilise une stratégie simple — à chaque tour, il propose un code tiré aléatoirement parmi ceux encore cohérents avec l'ensemble des feedbacks obtenus. L'espace des candidats est filtré après chaque proposition jusqu'à trouver le code secret.
-- **Simulation à grande échelle** : lance N parties (codes secrets tirés uniformément) et calcule la moyenne, l'écart-type et le maximum du nombre de tentatives, ainsi que la distribution complète.
-- **Interface web Flask** : formulaire de configuration (nombre de couleurs, longueur du code, répétition, mode de jeu, nombre de simulations) et page de résultats affichant les statistiques et un histogramme de la distribution.
+- **Four game variants**, obtained by combining two alternative rules:
+  - **Standard** mode (global feedback: number of correctly and incorrectly placed pegs) and **Beginners** mode (position-wise feedback: each position gets `red`, `white` or `none`), implemented through an abstract `MastermindGame` class and two subclasses (`StandardGame`, `BeginnersGame`).
+  - Color repetition in the secret code **allowed or forbidden**.
+- **Automatic solving**: as specified in the assignment, the codebreaker uses a simple strategy — at each turn it proposes a code drawn at random among those still consistent with all previous feedback. The candidate space is filtered after each guess until the secret code is found.
+- **Large-scale simulation**: runs N games (secret codes drawn uniformly) and computes the mean, standard deviation and maximum number of attempts, along with the full distribution.
+- **Flask web interface**: a configuration form (number of colors, code length, repetition, game mode, number of simulations) and a results page displaying the statistics and a histogram of the distribution.
 
-## Structure du projet
+## Project structure
 
 ```
 .
-├── app.py                     # Serveur Flask : routes et boucle de simulation
-├── mastermind/                # Package Python
-│   ├── __init__.py            # API publique du package
-│   ├── mastermind_game.py     # Classe abstraite MastermindGame
+├── app.py                     # Flask server: routes and simulation loop
+├── mastermind/                # Python package
+│   ├── __init__.py            # Public API of the package
+│   ├── mastermind_game.py     # Abstract class MastermindGame
 │   ├── variants.py            # StandardGame, BeginnersGame
-│   └── utils.py               # Génération de codes, calcul du feedback, filtrage
+│   └── utils.py               # Code generation, feedback computation, filtering
 ├── templates/
-│   ├── index.html             # Formulaire de configuration
-│   └── results.html           # Page de résultats (stats + histogramme)
-├── static/                    # CSS et images
-├── mastermindenv.yml          # Environnement Conda (Linux/Windows)
-├── mastermindenv_mac.yml      # Environnement Conda (macOS)
-├── sujet.pdf                  # Énoncé du projet
-└── knuth-mastermind.pdf       # Référence : l'article original de Knuth sur Mastermind
+│   ├── index.html             # Configuration form
+│   └── results.html           # Results page (stats + histogram)
+├── static/                    # CSS and images
+├── mastermindenv.yml          # Conda environment (Linux/Windows)
+├── mastermindenv_mac.yml      # Conda environment (macOS)
+├── sujet.pdf                  # Assignment brief
+└── knuth-mastermind.pdf       # Reference: Knuth's original paper on Mastermind
 ```
 
-## Installation et lancement
+## Installation and usage
 
-Avec Conda (recommandé, comme demandé dans le sujet) :
+With Conda (recommended, as required by the assignment):
 
 ```bash
-conda env create -f mastermindenv.yml      # ou mastermindenv_mac.yml sur macOS
+conda env create -f mastermindenv.yml      # or mastermindenv_mac.yml on macOS
 conda activate mastermindenv
 python app.py
 ```
 
-Alternativement, avec pip :
+Alternatively, with pip:
 
 ```bash
 python -m venv venv
-source venv/bin/activate                   # Windows : venv\Scripts\activate
+source venv/bin/activate                   # Windows: venv\Scripts\activate
 pip install flask numpy
 python app.py
 ```
 
-Ouvrir ensuite l'adresse affichée dans le terminal (par défaut `http://127.0.0.1:5000`).
+Then open the address shown in the terminal (default: `http://127.0.0.1:5000`).
 
-## Note sur l'algorithme
+## A note on the algorithm
 
-La stratégie du codebreaker est volontairement simple (tirage aléatoire parmi les candidats cohérents), car c'est celle imposée par l'énoncé. L'article de Knuth fourni en référence (`knuth-mastermind.pdf`) décrit une stratégie plus fine (minimax) qui garantit une résolution en au plus 5 coups au Mastermind classique ; elle n'est pas utilisée ici, l'objectif du projet étant l'architecture orientée objet et l'analyse statistique plutôt que l'optimisation du solveur.
+The codebreaker's strategy is intentionally simple (random choice among consistent candidates), as this is the strategy required by the assignment. The Knuth paper included as a reference (`knuth-mastermind.pdf`) describes a more sophisticated minimax strategy that guarantees solving classic Mastermind in at most 5 moves; it is not used here, as the goal of the project was the object-oriented design and statistical analysis rather than solver optimization.
 
-## Auteurs
+## Author
 
-Anis Mokhtari & Aymeric Pedanou
+Anis Mokhtari
